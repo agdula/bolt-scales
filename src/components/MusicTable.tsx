@@ -1,15 +1,17 @@
 import React, { useState } from 'react';
 import { ChevronDown } from 'lucide-react';
-import { MODES, SCALES, getChordQuality, type Scale } from '../utils/music';
+import { SCALES, getChordQuality, getRelatedScales, type Scale } from '../utils/music';
 
 export default function MusicTable() {
   const [selectedScale, setSelectedScale] = useState<Scale>(SCALES[0]);
   const [isOpen, setIsOpen] = useState(false);
 
-  const getChord = (modeIndex: number, chordNumber: number) => {
-    const noteIndex = (chordNumber - 1 + modeIndex) % 7;
-    const note = selectedScale.notes[noteIndex];
-    const quality = getChordQuality(modeIndex, chordNumber);
+  const relatedScales = getRelatedScales(selectedScale.notes[0]);
+
+  const getChord = (notes: string[], chordNumber: number) => {
+    const noteIndex = chordNumber - 1;
+    const note = notes[noteIndex];
+    const quality = getChordQuality('Major', chordNumber); // Using major scale qualities for simplicity
     return note + quality;
   };
 
@@ -45,7 +47,7 @@ export default function MusicTable() {
         <table className="min-w-full border-collapse">
           <thead>
             <tr>
-              <th className="border bg-gray-100 px-4 py-2">Mode / Chord</th>
+              <th className="border bg-gray-100 px-4 py-2">Scale / Chord</th>
               {[1, 2, 3, 4, 5, 6, 7].map((num) => (
                 <th key={num} className="border bg-gray-100 px-4 py-2">
                   {num}
@@ -54,14 +56,14 @@ export default function MusicTable() {
             </tr>
           </thead>
           <tbody>
-            {MODES.map((mode, modeIndex) => (
-              <tr key={mode}>
+            {relatedScales.map((scale) => (
+              <tr key={scale.name}>
                 <td className="border px-4 py-2 font-medium bg-gray-50">
-                  {mode}
+                  {scale.name}
                 </td>
                 {[1, 2, 3, 4, 5, 6, 7].map((chordNum) => (
                   <td key={chordNum} className="border px-4 py-2 text-center">
-                    {getChord(modeIndex, chordNum)}
+                    {getChord(scale.notes, chordNum)}
                   </td>
                 ))}
               </tr>
