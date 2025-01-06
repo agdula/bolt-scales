@@ -1,8 +1,45 @@
 import React, { useState } from 'react';
-import { NOTES, SCALES, generateScaleNotes, getChordName, getChordQuality } from '../utils/music';
+import { NOTES, SCALES, generateScaleNotes, getChordName } from '../utils/music';
+import { PianoRoll } from './PianoRoll';
 
 export default function MusicTable() {
   const [rootNote, setRootNote] = useState('C');
+
+  const getScaleDisplayName = (modeName: string): { parent: string } => {
+    const modeOffsets = {
+      'Ionian': 0,
+      'Dorian': -2,
+      'Phrygian': -4,
+      'Lydian': -5,
+      'Mixolydian': -7,
+      'Aeolian': -9,
+      'Locrian': -11
+    };
+
+    const offset = modeOffsets[modeName] || 0;
+    const parentRootIndex = (NOTES.indexOf(rootNote) + offset + 12) % 12;
+    const parentRoot = NOTES[parentRootIndex];
+    
+    return {
+      parent: `${modeName} mode of ${parentRoot} Major`
+    };
+  };
+
+  const getChordNotes = (note: string, quality: string): string[] => {
+    const baseNotes = {
+      'Maj7': [0, 4, 7, 11],
+      'm7': [0, 3, 7, 10],
+      '7': [0, 4, 7, 10],
+      'm7b5': [0, 3, 6, 10],
+      'Maj7#5': [0, 4, 8, 11],
+      '7b9': [0, 4, 7, 10, 13],
+      'o7': [0, 3, 6, 9]
+    };
+
+    const intervals = baseNotes[quality] || baseNotes['Maj7'];
+    const rootIndex = NOTES.indexOf(note);
+    return intervals.map(interval => NOTES[(rootIndex + interval) % 12]);
+  };
 
   return (
     <div className="max-w-7xl mx-auto p-4">
@@ -37,17 +74,28 @@ export default function MusicTable() {
           <tbody className="bg-white divide-y divide-gray-200">
             {Object.entries(SCALES).map(([name, scale], scaleIndex) => {
               const notes = generateScaleNotes(rootNote, scale);
+              const scaleInfo = getScaleDisplayName(name);
               return (
                 <tr key={name} className={`
                   ${scaleIndex % 2 === 0 ? 'bg-white' : 'bg-gray-50'}
                   hover:bg-gray-100 transition-colors duration-150
                 `}>
-                  <td className="px-6 py-4 whitespace-nowrap font-medium text-gray-900 border-r">
-                    {name}
+                  <td className="px-6 py-4 whitespace-nowrap font-medium text-gray-900 border-r w-fit">
+                    <div className="flex flex-col gap-0.5">
+                      <span className="text-sm">{scaleInfo.parent}</span>
+                    </div>
                   </td>
                   {notes.map((note, index) => (
-                    <td key={index} className="px-6 py-4 whitespace-nowrap text-gray-600 border-r">
-                      {getChordName(note, scale.chordQualities[index])}
+                    <td key={index} className="px-4 py-3 whitespace-nowrap text-gray-600 border-r">
+                      <div className="flex flex-col items-center gap-1">
+                        <span className="font-medium text-sm">
+                          {getChordName(note, scale.chordQualities[index])}
+                        </span>
+                        <PianoRoll 
+                          notes={getChordNotes(note, scale.chordQualities[index])}
+                          className="hover:shadow-md transition-shadow duration-200"
+                        />
+                      </div>
                     </td>
                   ))}
                 </tr>
