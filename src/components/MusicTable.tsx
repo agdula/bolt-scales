@@ -42,7 +42,7 @@ export default function MusicTable() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto p-4">
+    <div className="w-full p-4">
       <div className="mb-6">
         <label htmlFor="root-note" className="block text-sm font-medium text-gray-700 mb-2">
           Root Note
@@ -59,13 +59,13 @@ export default function MusicTable() {
         </select>
       </div>
       
-      <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-gray-200 border border-gray-200 rounded-lg">
+      <div className="w-full">
+        <table className="w-full table-fixed divide-y divide-gray-200 border border-gray-200 rounded-lg">
           <thead className="bg-gray-50">
             <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b">Scale</th>
+              <th className="w-1/8 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b">Scale</th>
               {[1, 2, 3, 4, 5, 6, 7].map(degree => (
-                <th key={degree} className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b">
+                <th key={degree} className="w-1/8 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b">
                   {degree === 1 ? '1 (Root)' : degree}
                 </th>
               ))}
@@ -93,6 +93,7 @@ export default function MusicTable() {
                         </span>
                         <PianoRoll 
                           notes={getChordNotes(note, scale.chordQualities[index])}
+                          rootNote={rootNote}
                           className="hover:shadow-md transition-shadow duration-200"
                         />
                       </div>
